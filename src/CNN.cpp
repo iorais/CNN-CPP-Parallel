@@ -183,7 +183,7 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 				time(&elapsed);
 				total=(double) (elapsed-t_start)/sample*DS_len;
 				left=total - (double) (elapsed - t_start);
-				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  ||  Elapsed time: %02.2f - Left time: %02.2f - Total time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
+				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Label: %d - Prediction: %d  ||  Time Elapsed: %02.2f - Time Left: %02.2f - Total Time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
 			}
 		}
 
