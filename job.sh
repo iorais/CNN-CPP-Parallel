@@ -11,6 +11,12 @@
 #SBATCH -t 02:00:00
 #SBATCH --mail-type=ALL
 
+#
+# Run the following command to submit a job:
+#
+# sbatch --mail-user=<user@email.com> job.sh
+#
+
 module load GCC
 make
 ./bin/CNN
