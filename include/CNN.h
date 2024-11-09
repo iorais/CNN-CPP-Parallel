@@ -34,7 +34,7 @@ class CNN{
 
         void _forward(volume& image);
         void _backward(vector<double>& gradient);
-        void _iterate(volume& dataset, vector<int>& labels, vector<double>& loss_list, vector<double>& acc_list,int preview_period ,bool b_training = true);
+        void _iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list,int preview_period ,bool b_training = true);
         void _get_image(volume& image, volume& dataset, int index);
         
     public:
@@ -44,8 +44,8 @@ class CNN{
         void add_pooling(int image_dim[3], char mode='a', int size=2, int stride=2, int padding=0);
         void add_dense(int input, vector<int>& hidden, int num_classes=10, double bias=1.0, bool adam=true, double eta = 0.01);
         void load_dataset(string data_name );  
-        void training( int epochs = 1, int preview_period = 1);
-        void testing( int preview_period = 1);
+        void training(int epochs, int preview_period, int batch_size=1, bool validation=false);
+        void testing(int preview_period = 1);
         void sanity_check(int set_size=50 ,int epochs=200);
         void plot_results();
         ~CNN();

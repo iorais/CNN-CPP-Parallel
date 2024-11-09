@@ -21,7 +21,6 @@ all: $(TARGET)
 # Link object files to create the executable
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $@ $^
-	clear
 
 # Pattern rule to compile .cpp files into .o files in the build directory
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)

@@ -19,4 +19,4 @@
 
 module load GCC
 make
-./bin/CNN
+./bin/CNN --preview_period 1

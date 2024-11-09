@@ -22,7 +22,7 @@ int main(int argc, char ** argv){
 
 
     const char USAGE_MESSAGE[] = 
-    "Usage: ./CNN [--num_epochs <int>] [--sanity_check <bool>]\n"
+    "Usage: ./CNN [--num_epochs <int>] [--sanity_check <bool>] [--preview_period <int>]\n"
     "Default values:\n"
     "  --num_epochs: 1\n"
     "  --sanity_check: false\n"
@@ -76,7 +76,7 @@ int main(int argc, char ** argv){
 
     //train the network (Batch Size = 1)
 
-    network.training(epochs=num_epochs, preview_period=preview_period);
+    network.training(num_epochs, preview_period);
 
     //evaluate new samples 
 
