@@ -1,7 +1,6 @@
 CNN: main.o CNN.o Filters.o Datasets.o Volumes.o MLP.o
 	g++ main.o CNN.o Filters.o Datasets.o Volumes.o MLP.o -o CNN
 	clear
-	./CNN
 
 main.o: main.cpp CNN.cpp CNN.h
 	g++ -c -Wall main.cpp CNN.h CNN.cpp 
@@ -20,3 +19,6 @@ Volumes.o: Volumes.cpp Volumes.h
 
 MLP.o: MLP.h MLP.cpp
 	g++ -c -Wall MLP.h MLP.cpp
+
+clean:
+	-rm -f CNN CNN.h.gch CNN.o Datasets.h.gch Datasets.o Filters.h.gch Filters.o main.o MLP.h.gch MLP.o Volumes.h.gch Volumes.o 
