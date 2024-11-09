@@ -15,6 +15,46 @@ int         input_layer, num_classes, epochs, padding, stride;
 
 
 int main(int argc, char ** argv){
+    // Default values 
+    int num_epochs = 1;           
+    bool sanity_check = false;
+    int preview_period = 10;
+
+
+    const char USAGE_MESSAGE[] = 
+    "Usage: ./CNN [--num_epochs <int>] [--sanity_check <bool>]\n"
+    "Default values:\n"
+    "  --num_epochs: 1\n"
+    "  --sanity_check: false\n"
+    "  --preview_period: 10";
+
+    // Parse command-line arguments
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+
+        if (arg == "--num_epochs" && i + 1 < argc) {
+            num_epochs = std::stoi(argv[i + 1]);
+            i++; // Skip the next argument as it's part of --num_epochs
+        } else if (arg == "--sanity_check" && i + 1 < argc) {
+            std::string value = argv[i + 1];
+            sanity_check = (value == "true" || value == "1"); // Allow "true"/"1" as true values
+            i++; // Skip the next argument as it's part of --sanity_check
+        } else if (arg == "--preview_period" && i + 1 < argc) {
+            std::string value = argv[i + 1];
+            preview_period = std::stoi(argv[i + 1]);
+            i++; // Skip the next argument as it's part of --preview_period
+        } else {
+            std::cerr 
+                << "Unknown argument: " << arg << std::endl 
+                << USAGE_MESSAGE << std::endl;
+            exit(1); 
+        }
+    }
+
+    // Display the parsed values
+    std::cout << "Number of epochs: " << num_epochs << std::endl;
+    std::cout << "Sanity check: " << (sanity_check ? "enabled" : "disabled") << std::endl;
+    std::cout << "Preview period: " << preview_period << std::endl;
 
     //network istantiation
 
@@ -31,12 +71,12 @@ int main(int argc, char ** argv){
     network.load_dataset("MNIST");
 
     //sanity check
-
-    //network.sanity_check();
+    if (sanity_check)
+        network.sanity_check();
 
     //train the network (Batch Size = 1)
 
-    network.training(epochs=1, 10);
+    network.training(epochs=num_epochs, preview_period=preview_period);
 
     //evaluate new samples 
 
