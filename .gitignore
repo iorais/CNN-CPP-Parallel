@@ -4,5 +4,11 @@
 # Ignore all precompiled header files
 *.h.gch
 
+# Ignore all log files
+*.log
+
+# Ignore all error log files
+*.err
+
 # Ignore execution file
 CNN
