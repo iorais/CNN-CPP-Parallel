@@ -1,1 +1,0 @@
-This directory stores the object files after calling make.

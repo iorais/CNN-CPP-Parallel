@@ -1,0 +1,1 @@
+This directory stores SLURM error log files.
