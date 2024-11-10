@@ -38,5 +38,5 @@ clean:
 	rm -rf $(BUILD_DIR)/*.o $(TARGET)
 
 # Clean up logs and errors directories
-logs:
+clean-logs:
 	rm -rf logs/*.log errors/*.err
