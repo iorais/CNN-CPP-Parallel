@@ -158,11 +158,11 @@ void MNIST::get_mnist(volume& Train_DS, vector<int>& Train_L,
 
     cout<<"\no Getting MNIST datasets\n"<<endl;
 
-    _get_set("MNIST_data/train-images.idx3-ubyte", MNIST_TRAIN_LEN, Train_DS, IMAGE_DATA);
-    _get_label("MNIST_data/train-labels.idx1-ubyte", MNIST_TRAIN_LEN, Train_L);
+    _get_set("../datasets/train-images.idx3-ubyte", MNIST_TRAIN_LEN, Train_DS, IMAGE_DATA);
+    _get_label("../datasets/train-labels.idx1-ubyte", MNIST_TRAIN_LEN, Train_L);
 
-    _get_set("MNIST_data/t10k-images.idx3-ubyte", MNIST_TEST_LEN, Test_DS, IMAGE_DATA);
-    _get_label("MNIST_data/t10k-labels.idx1-ubyte", MNIST_TEST_LEN, Test_L);
+    _get_set("../datasets/t10k-images.idx3-ubyte", MNIST_TEST_LEN, Test_DS, IMAGE_DATA);
+    _get_label("../datasets/t10k-labels.idx1-ubyte", MNIST_TEST_LEN, Test_L);
 
     _normalize_set(Train_DS, MNIST_TRAIN_LEN, 28, 28);
     _normalize_set(Test_DS, MNIST_TEST_LEN, 28, 28);

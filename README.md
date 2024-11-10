@@ -25,24 +25,24 @@ The interface is similar to the one of other popular software such as PyTorch an
 The program is composed by 6 modules:
 
 ##### MLP:
-Defines the basic block of the Multi Layer Perceptron and is in charge of generate the fully connected 	layers. 
+Defines the basic block of the Multi Layer Perceptron and is in charge of generating the fully connected layers. 
 The activation function implemented is the (old fashioned) sigmoid.  
 The parameter update is performed using SGD or Adam.  
 
 ##### Volumes: 
-It allows to create tensors for store and manipulating images.  
+It allows to create tensors for storing and manipulating images.  
 It is a key element for the operation of the various modules, making image management very simple and fast.  
 Images are treated as vectors but conceptually they are transposed into a n-dimensional volume and accessed as such, not unlike numpy.  
 The number of dimensions is arbitrary.  
 
 ##### Filters: 
 Defines the convolutional layers such as filters and pooling layers.  
-The pooling layer perform a downsample of the input volume using a average pooling or a max pooling.  
+The pooling layer perform a downsample of the input volume using an average pooling or a max pooling.  
 The convolutional layers are initialized with random values and with user defined hyperparameters.  
-They leverages on the Leaky ReLu activation function. They can also implement padding.  
+They leverage the Leaky ReLu activation function. They can also implement padding.  
 
 ##### CNN:
-Defines the relations between the instantiated objects, it iterates through different layers the forward and backwards pass and manages the training, evaluation, testing and plotting steps.  
+Defines the relations between the instantiated objects, it iterates through different layers, the forward and backwards pass, and manages the training, evaluation, testing and plotting steps.  
 
 ##### Datasets: 
 It’s in charge of generate a compatible set of lists of datasets for the CNN.  

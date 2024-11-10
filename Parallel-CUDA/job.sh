@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --export=ALL
-#SBATCH -t 02:00:00
+#SBATCH -t 08:00:00
 #SBATCH --mail-type=ALL
 
 #
@@ -19,4 +19,4 @@
 
 module load GCC
 make
-./bin/CNN --preview_period 1
+bin/CNN --num_epochs 30 --preview_period 2
