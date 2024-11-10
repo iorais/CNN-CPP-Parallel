@@ -25,7 +25,7 @@ class Convolutional {
     int _image_dim[3] ={1,16,16};     // image specification
     int _specs[4]     ={2,3,3,1}; 		// filter specifications
     int _out_dim[3]   ={2,13,13};     // convoluted output dimensions 
-
+    
     int _padding=1;
     int _stride=2;
     int _iteration = 0;		  // To update the gradient descent 
@@ -45,7 +45,7 @@ class Convolutional {
 
   public: 
 
-    //Store a copy of the vectors since they can cange outside
+    //Store a copy of the vectors since they can change outside
     Convolutional(int image_dim[3], int kernels[4], int padding=1, int stride=1, double bias=0.1, double eta=0.01); 
 
     void new_epoch(double eta);
