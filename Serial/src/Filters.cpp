@@ -266,3 +266,54 @@ void Convolutional::new_epoch(double eta){
     _iteration=0;
 
 }
+
+Pooling::Pooling(int pool_size[2], int stride, std::string mode){
+    _pool_size[0] = pool_size[0];
+    _pool_size[1] = pool_size[1];
+    
+    _stride = stride;
+    _mode = mode;
+}
+
+void Pooling::fwd(volume &input, volume &output) {
+    int in_depth = input.get_shape(0);
+    int in_height = input.get_shape(1);
+    int in_width = input.get_shape(2);
+
+    int out_height = (in_height - _pool_size[0]) / _stride + 1;
+    int out_width = (in_width - _pool_size[1]) / _stride + 1;
+    int out_dim[3] = {in_depth, out_height, out_width};
+    output.rebuild(out_dim, 3);
+
+    _cache = input;
+
+
+    for (int d = 0; d < in_depth; ++d) {
+        for (int y = 0; y < out_height; ++y) {
+            for (int x = 0; x < out_width; ++x) {
+                double pool_val = (_mode == "max") ? -numeric_limits<double>::infinity() : 0.0;
+                
+                for (int i = 0; i < _pool_size[0]; ++i) {
+                    for (int j = 0; j < _pool_size[1]; ++j) {
+                        int in_y = y * _stride + i;
+                        int in_x = x * _stride + j;
+
+                        int in_cache[3] = {d, in_y, in_x};
+
+                        if (_mode == "max") {
+                            pool_val = max(pool_val, _cache.get_value(in_cache, 3));
+                        } else {
+                            pool_val += _cache.get_value(in_cache, 3);
+                        }
+                    }
+                }
+                
+                if (_mode == "avg") {
+                    pool_val /= (_pool_size[0] * _pool_size[1]);
+                }
+                int in_cache[3] = {d, y, x};
+                output.assign(pool_val, in_cache, 3);
+            }
+        }
+    }
+}
