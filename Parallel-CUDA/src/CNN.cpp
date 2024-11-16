@@ -1,4 +1,4 @@
-#include "CNN.h"
+#include "../include/CNN.h"
 
 
 void CNN::add_conv(vector<int>& image_dim, vector<int>& kernels, int padding, int stride, double bias, double eta){
@@ -46,17 +46,31 @@ void CNN::load_dataset(string data_name ){
 	
 }
 
+void CNN::load_batch(volume& batch_data, vector<int>& batch_labels, int batch_size, int batch_index) {
+    int start_index = batch_index * batch_size;
+    int end_index = start_index + batch_size;
+
+    batch_data.rebuild(_image_shape, 3, batch_size);
+    batch_labels.resize(batch_size);
+
+    for (int i = start_index; i < end_index; ++i) {
+        volume image;
+        _get_image(image, Train_DS, i);
+		batch_data.set_subvolume(image, i - start_index);
+        batch_labels[i - start_index] = Train_L[i];
+    }
+}
 
 
-void CNN::_forward(volume& image){
+
+void CNN::_forward(volume& image, int batch_size){
 
 	volume img_out;
 
 	for(int i=0; i<_tot_layers; i++){
 		
 		if(_layers[i]=='C'){
-			_convs[_conv_index].fwd(image,img_out);
-
+			_convs[_conv_index].fwd(image,img_out,batch_size);
 			_conv_index++;
 			image=img_out;			
 		}
@@ -125,68 +139,89 @@ void CNN::_get_image(volume& image, volume& dataset, int index){
 }
 
 
-void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list, int preview_period, bool b_training ){
+void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list, int preview_period, bool b_training) {
+    int label = 0;
+    double accuracy = 0, loss = 0, correctAnswer = 0;
+    volume batch_data;
+    vector<int> batch_labels;
 
-		int label = 0; 
-		double accuracy = 0, loss = 0, correctAnswer = 0;
-		volume image;
-		
-  		// stores time in t_start
-		time_t t_start;
-  		time(&t_start);
-		
-		int DS_len = dataset.get_shape(0);
+    // stores time in t_start
+    time_t t_start;
+    time(&t_start);
 
-		for(int sample=0; sample<DS_len; sample++ ){
-			
-			_get_image(image, dataset, sample);	
-			label = labels[sample];
+    int DS_len = dataset.get_shape(0);
+    int num_batches = (DS_len + batch_size - 1) / batch_size;
 
-			//feed the sample into the network 
-			//The result is stored in _result
-			_conv_index=0;
-			_forward(image);	//--> _result
+    for (int batch = 0; batch < num_batches; ++batch) {
+        int start_index = batch * batch_size;
+        int end_index = min(start_index + batch_size, DS_len);
+        int current_batch_size = end_index - start_index;
 
-			//Error evaluation:
-			vector<double> y(_num_classes,0), error(_num_classes,0);
-			y[label]=1;
+        // Load batch data and labels
+        batch_data.rebuild(_image_shape, 3, current_batch_size);
+        batch_labels.resize(current_batch_size);
 
-			for(int i=0; i<_num_classes; i++) error[i] = y[i] - _result[i];
-			
-			// update MSE loss function
-			double sum_squared_error=0;
-			for(int i=0; i<_num_classes; i++) sum_squared_error+=pow(error[i],2);
-			
-			loss = sum_squared_error / _num_classes;
+        for (int i = start_index; i < end_index; ++i) {
+            volume image;
+            _get_image(image, dataset, i);
+            batch_data.set_subvolume(image, i - start_index);
+            batch_labels[i - start_index] = labels[i];
+        }
 
-			loss_list.push_back( loss );
-			
-			int prediction=0;
-			for(int i=0; i<_num_classes; i++){
-				if(_result[i]>_result[prediction]) prediction=i;
-			}
-			
-			if ( (int) prediction == label) correctAnswer++;
+        // Feed the batch into the network
+        // The result is stored in _result
+        _conv_index = 0;
+        _forward(batch_data, current_batch_size); // --> _result
 
-			// update accuracy
-			accuracy = correctAnswer * 100 / ( sample + 1 );
-			acc_list.push_back( accuracy );
+        // Error evaluation:
+        vector<double> y(_num_classes, 0), error(_num_classes, 0);
+        for (int i = 0; i < current_batch_size; ++i) {
+            y[batch_labels[i]] = 1;
 
-			//adjust the weight
+            for (int j = 0; j < _num_classes; ++j) {
+                error[j] = y[j] - _result[i * _num_classes + j];
+            }
 
-			if (b_training) _backward(error);
-				
-			if((sample+1)%preview_period==0 && sample!=1) {
+            // Update MSE loss function
+            double sum_squared_error = 0;
+            for (int j = 0; j < _num_classes; ++j) {
+                sum_squared_error += pow(error[j], 2);
+            }
 
-				double left, total;
-				time_t elapsed;
-				time(&elapsed);
-				total=(double) (elapsed-t_start)/sample*DS_len;
-				left=total - (double) (elapsed - t_start);
-				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Label: %d - Prediction: %d  ||  Time Elapsed: %02.2f - Time Left: %02.2f - Total Time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
-			}
-		}
+            loss = sum_squared_error / _num_classes;
+            loss_list.push_back(loss);
 
+            int prediction = 0;
+            for (int j = 0; j < _num_classes; ++j) {
+                if (_result[i * _num_classes + j] > _result[i * _num_classes + prediction]) {
+                    prediction = j;
+                }
+            }
+
+            if (prediction == batch_labels[i]) {
+                correctAnswer++;
+            }
+
+            // Update accuracy
+            accuracy = correctAnswer * 100 / (start_index + i + 1);
+            acc_list.push_back(accuracy);
+
+            // Adjust the weight
+            if (b_training) {
+                _backward(error);
+            }
+        }
+
+        if ((start_index + current_batch_size) % preview_period == 0 && start_index != 0) {
+            double left, total;
+            time_t elapsed;
+            time(&elapsed);
+            total = (double)(elapsed - t_start) / (start_index + current_batch_size) * DS_len;
+            left = total - (double)(elapsed - t_start);
+            printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Time Elapsed: %02.2f - Time Left: %02.2f - Total Time: %02.2f \r",
+                   b_training ? "Train" : "Valid", accuracy, loss, start_index + current_batch_size, (double)elapsed - t_start, left, total);
+        }
+    }
 }
 
 

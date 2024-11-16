@@ -1,4 +1,4 @@
-#include "Volumes.h"
+#include "../include/Volumes.h"
 
 volume::volume(){
 
@@ -68,17 +68,46 @@ void volume::init(const int* shapes, int dimensions){
 }
 
 //The contenent is lost
-void volume::rebuild(int* shapes, int dimensions){
+void volume::rebuild(int* shapes, int dimensions, int batch_size){
 
     _length=1;
-    _dim=dimensions;
+    _dim=dimensions + 1;
     _shape.assign(shapes,shapes+dimensions);
+    _shape.insert(_shape.begin(),batch_size);
 
-    for (int i=0; i<dimensions; i++) _length*=shapes[i];
+    for (int i=0; i< _dim; i++) _length*=_shape[i];
 
     _mtx.assign(_length,0);
 
 
+}
+
+void volume::set_subvolume(volume& subvol, int index) {
+    int subvol_length = subvol.get_length();
+    int subvol_depth = subvol.get_shape(0);
+    int subvol_height = subvol.get_shape(1);
+    int subvol_width = subvol.get_shape(2);
+
+    int batch_size = _shape[0];
+    int depth = _shape[1];
+    int height = _shape[2];
+    int width = _shape[3];
+
+    // Ensure the subvolume dimensions match the expected dimensions
+    if (subvol_depth != depth || subvol_height != height || subvol_width != width) {
+        throw std::invalid_argument("Subvolume dimensions do not match the expected dimensions.");
+    }
+
+    // Copy the subvolume data into the larger volume at the specified index
+    for (int d = 0; d < depth; ++d) {
+        for (int h = 0; h < height; ++h) {
+            for (int w = 0; w < width; ++w) {
+                int subvol_idx = ((d * height + h) * width + w);
+                int batch_idx = ((index * depth + d) * height + h) * width + w;
+                _mtx[batch_idx] = subvol.get_vector()[subvol_idx];
+            }
+        }
+    }
 }
 
 

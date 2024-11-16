@@ -1,5 +1,5 @@
-
-#include "Filters.h"
+#include "../include/conv_cuda.h"
+#include "../include/Filters.h"
 
 using namespace std;
 
@@ -94,60 +94,56 @@ void Convolutional::_out_dimension(){
 
 
 
-void Convolutional::fwd(volume image, volume& out){
+void Convolutional::fwd(volume image, volume& out, int batch_size){
 
     /*Produces a volume of size D2xH2xW2 where:
 			#W2=(W1−F+2P)/S+1
 			#H2=(H1−F+2P)/S+1
 			#D2= kernels number
     */
-
-    int f_y= _specs[1], f_x= _specs[2], f_d= _specs[3];
-    int n_kernel = _specs[0];
-     
+    int f_y = _specs[1], f_x = _specs[2], f_d = _specs[3];
+    int n_kernel= _specs[0];
     _out_dimension();
     int depth = _out_dim[0], out_H = _out_dim[1], out_W = _out_dim[2];
 
-    out.rebuild( _out_dim, 3 );
+    out.rebuild(_out_dim, 3, batch_size);
 
-    if(_padding!=0) _pad(image, _cache);   
-    else _cache=image;                     
-    // Now image is saved and adjusted in _cache 
+    // Padding the image
+    if (_padding != 0) _pad(image, _cache);
+    else _cache = image;
 
-	int y_out=0, x_out = 0;
+    // Allocate memory on the device
+    float* d_input;
+    float* d_output;
+    float* d_filter;
+    float* d_bias;
+    cudaMalloc(&d_input, _cache.size() * batch_size * sizeof(float));
+    cudaMalloc(&d_output, out.size() * batch_size * sizeof(float));
+    cudaMalloc(&d_filter, _filter.size() * sizeof(float));
+    cudaMalloc(&d_bias, _bias.size() * sizeof(float));
 
-    for(int kernel=0; kernel < n_kernel; kernel++){
+    // Copy data to the device
+    cudaMemcpy(d_input, _cache.data(), _cache.size() * batch_size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_filter, _filter.data(), _filter.size() * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_bias, _bias.data(), _bias.size() * sizeof(float), cudaMemcpyHostToDevice);
 
-        for (int layer=0; layer<depth; layer++ ){//each kernel has n (3) layers, one for each of the n (3) layers of the image, the depth.
-            
-            y_out = 0, x_out = 0;
+    // Define block and grid sizes
+    dim3 blockSize(out_W, 16, 1);
+    dim3 gridSize(batch_size, n_kernel, (out_H + blockSize.y - 1) / blockSize.y);
 
-            for (int y=0; y<_image_dim[1] - f_y; y+=_stride){	// image = ( depth x H x W )
-                x_out=0;
+    // Launch the CUDA kernel
+    convolution_forward<<<gridSize, blockSize>>>(d_input, d_output, d_filter, d_bias, depth, _image_dim[1], _image_dim[2], f_y, f_x, f_d, n_kernel, out_H, out_W, _stride, _padding, batch_size);
 
-                for (int x=0; x<_image_dim[2] - f_x; x+=_stride ){
+    // Copy the result back to the host
+    cudaMemcpy(out.data(), d_output, out.size() * batch_size * sizeof(float), cudaMemcpyDeviceToHost);
 
-                    for (int f_y_it=0; f_y_it<f_y; f_y_it++){
-                        for(int f_x_it=0; f_x_it<f_x; f_x_it++){
+    // Free device memory
+    cudaFree(d_input);
+    cudaFree(d_output);
+    cudaFree(d_filter);
+    cudaFree(d_bias);
 
-                            int arr_out[3] = {kernel,y_out,x_out};
-                            int in_cache[3] = {layer, y + f_y_it, x + f_x_it};
-                            int in_filt[4] = {kernel, f_y_it, f_x_it, layer};
-                            double val = _cache.get_value(in_cache,3)*_filter.get_value(in_filt,4);
-                            out.sum(val, arr_out, 3);
-
-                        }
-                    }        
-                    x_out++;
-                }
-                y_out++;
-            }
-        out[kernel]+=_bias[kernel];
-        }
-
-    }
-
-    ReLu(out);	
+    ReLu(out);
 }
 
 

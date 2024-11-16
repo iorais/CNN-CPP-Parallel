@@ -50,7 +50,7 @@ class Convolutional {
 
     void new_epoch(double eta);
 
-    void fwd(volume image, volume& out);
+    void fwd(volume image, volume& out, int batch_size);
 
     void bp(volume d_out_vol, volume& d_input);
 

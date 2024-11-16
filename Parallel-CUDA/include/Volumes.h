@@ -22,7 +22,7 @@ class volume{
         volume(int* shapes, int dimensions);
 
         void init(const int* shapes, int dimensions); //Usefull to postpone istantiation
-        void rebuild(int* shapes, int dimensions);
+        void rebuild(int* shapes, int dimensions, int batch_size);
 
         int get_shape(int dim_n);
         int get_length();
@@ -31,6 +31,7 @@ class volume{
         
         void assign(double val, int* index, int dimensions);
         void sum(double val, int* index, int dimensions);
+        void set_subvolume(volume& subvol, int index);
         //void adjust(double val);
 
         volume& operator=(const volume &start_vol);
