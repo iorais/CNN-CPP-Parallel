@@ -13,7 +13,7 @@ void CNN::add_conv(vector<int>& image_dim, vector<int>& kernels, int padding, in
 }
 
 
-void CNN::add_pooling(int pool_size[2], int stride, string mode){
+void CNN::add_pooling(vector<int> &pool_size, int stride, string mode){
 
 	Pooling element(pool_size, stride, mode);
 	_pools.push_back(element);
@@ -102,7 +102,11 @@ void CNN::_backward(vector<double>& gradient){
 			_convs[_conv_index].bp(img_in, img_out);	
 			img_in=img_out;	
 		}
-		else if(_layers[i]=='P'){}
+		else if(_layers[i]=='P'){
+			_pool_index--;
+			_pools[_pool_index].bp(img_in, img_out);
+			img_in=img_out;
+		}
 		else if(_layers[i]=='D'){	
 			gradient=_dense[0].bp(gradient);	
 			

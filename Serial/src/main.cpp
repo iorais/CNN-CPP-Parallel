@@ -10,7 +10,9 @@ using namespace std;
 bool        adam;
 double      bias, eta;
 vector<int> image_1{1,28,28}, kernels_1{8,3,3,1};
-vector<int> image_2{8,13,13}, kernels_2{2,3,3,8},  hidden{72};
+// vector<int> pool_size{3,3};
+vector<int> image_2{8,13,13}, kernels_2{2,3,3,8};
+vector<int> hidden{2*6*6};
 int         input_layer, num_classes, epochs, padding, stride;
 
 

@@ -267,7 +267,7 @@ void Convolutional::new_epoch(double eta){
 
 }
 
-Pooling::Pooling(int pool_size[2], int stride, std::string mode){
+Pooling::Pooling(vector<int> pool_size, int stride, std::string mode){
     _pool_size[0] = pool_size[0];
     _pool_size[1] = pool_size[1];
     
@@ -313,6 +313,53 @@ void Pooling::fwd(volume &input, volume &output) {
                 }
                 int in_cache[3] = {d, y, x};
                 output.assign(pool_val, in_cache, 3);
+            }
+        }
+    }
+}
+
+void Pooling::bp(volume d_out_vol, volume& d_input) {
+    // Initialize d_input with the same dimensions as the input cached during forward pass
+    int in_depth = _cache.get_shape(0);
+    int in_height = _cache.get_shape(1);
+    int in_width = _cache.get_shape(2);
+
+    int img_dim[3] = {in_depth, in_height, in_width}; 
+
+    d_input.rebuild(img_dim, 3);
+
+
+    int out_height = d_out_vol.get_shape(1);
+    int out_width = d_out_vol.get_shape(2);
+
+    for (int d = 0; d < in_depth; ++d) {
+        for (int y = 0; y < out_height; ++y) {
+            for (int x = 0; x < out_width; ++x) {
+                int out_idx[3] = {d, y, x};
+                double grad = d_out_vol.get_value(out_idx, 3); // Gradient from the next layer
+
+                for (int i = 0; i < _pool_size[0]; ++i) {
+                    for (int j = 0; j < _pool_size[1]; ++j) {
+                        int in_y = y * _stride + i;
+                        int in_x = x * _stride + j;
+
+                        if (in_y < in_height && in_x < in_width) {
+                            int in_idx[3] = {d, in_y, in_x};
+
+                            if (_mode == "max") {
+                                // For max pooling, propagate the gradient to the max value position
+                                double cached_value = _cache.get_value(in_idx, 3);
+                                int max_idx[3] = {d, y, x};
+                                if (cached_value == d_out_vol.get_value(max_idx, 3)) {
+                                    d_input.sum(grad, in_idx, 3);
+                                }
+                            } else if (_mode == "avg") {
+                                // For average pooling, distribute the gradient equally
+                                d_input.sum(grad / (_pool_size[0] * _pool_size[1]), in_idx, 3);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

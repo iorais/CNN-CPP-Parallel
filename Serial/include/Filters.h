@@ -68,7 +68,7 @@ class Pooling {
 
 public:
 
-    Pooling(int pool_size[2], int stride, string mode);
+    Pooling(vector<int> pool_size, int stride, string mode);
 
     void fwd(volume &input, volume &output);
 
