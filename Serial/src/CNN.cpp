@@ -13,6 +13,14 @@ void CNN::add_conv(vector<int>& image_dim, vector<int>& kernels, int padding, in
 }
 
 
+void CNN::add_pooling(int pool_size[2], int stride, string mode){
+
+	Pooling element(pool_size, stride, mode);
+	_pools.push_back(element);
+	_layers.push_back('P');
+	_tot_layers++;
+}
+
 void CNN::add_dense(int input, vector<int>& hidden, int num_classes, double bias, bool adam, double eta){
 
 	vector<int> layers(hidden); // Obtain a copy (since hidden can change outside)
@@ -59,9 +67,12 @@ void CNN::_forward(volume& image){
 
 			_conv_index++;
 			image=img_out;			
-		}
-		else if(_layers[i]=='P'){}
-		else if(_layers[i]=='D'){
+		} else if(_layers[i]=='P') {
+			_pools[_pool_index].fwd(image,img_out);
+
+			_pool_index++;
+			image=img_out;
+		} else if(_layers[i]=='D') {
 
 			if(_dense_input_shape[0]==0){
 				for(int i=0; i<3; i++) 

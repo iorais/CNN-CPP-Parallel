@@ -32,7 +32,7 @@ The parameter update is performed using SGD or Adam.
 ##### Volumes: 
 It allows to create tensors for storing and manipulating images.  
 It is a key element for the operation of the various modules, making image management very simple and fast.  
-Images are treated as vectors but conceptually they are transposed into a n-dimensional volume and accessed as such, not unlike numpy.  
+Images are treated as vectors but conceptually they are transposed into an n-dimensional volume and accessed as such, not unlike numpy.  
 The number of dimensions is arbitrary.  
 
 ##### Filters: 

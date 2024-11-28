@@ -60,7 +60,20 @@ class Convolutional {
 
 class Pooling {
 
-};
+    int _pool_size[2];
+    int _stride;
+    string _mode;
+
+    volume _cache;
+
+public:
+
+    Pooling(int pool_size[2], int stride, string mode);
+
+    void fwd(volume &input, volume &output);
+
+    void bp(volume d_out_vol, volume& d_input);
+}; 
 
 
 #endif
