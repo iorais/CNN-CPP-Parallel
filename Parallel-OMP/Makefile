@@ -6,7 +6,7 @@ INCLUDE_DIR = include
 
 # Compiler and flags
 CC = g++
-CFLAGS = -Wall -I$(INCLUDE_DIR)
+CFLAGS = -Wall -I$(INCLUDE_DIR) -O3 -fopenmp
 
 # Source files and object files
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)

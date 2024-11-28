@@ -19,4 +19,4 @@
 
 module load GCC
 make
-bin/CNN --num_epochs 30 --preview_period 2
+bin/CNN --num_epochs 1 --preview_period 10

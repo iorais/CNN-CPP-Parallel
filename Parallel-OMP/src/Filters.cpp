@@ -6,6 +6,7 @@ using namespace std;
 
 
 void ReLu(volume& input_volume){
+    #pragma omp parallel
     for(int a=0; a<input_volume.get_length(); a++)
         if( input_volume[a]<0) input_volume[a] *= ALPHA;
 }
@@ -15,6 +16,7 @@ void ReLu(volume& input_volume){
 void deLeReLu(volume& input_volume){
 
     //Same of doing:
+    #pragma omp parallel
     for(int a=0; a<input_volume.get_length(); a++)
         if( input_volume[a]<0) input_volume[a] = ALPHA;
 }
@@ -114,13 +116,13 @@ void Convolutional::fwd(volume image, volume& out){
     else _cache=image;                     
     // Now image is saved and adjusted in _cache 
 
-	int y_out=0, x_out = 0;
 
+    #pragma omp parallel for
     for(int kernel=0; kernel < n_kernel; kernel++){
 
         for (int layer=0; layer<depth; layer++ ){//each kernel has n (3) layers, one for each of the n (3) layers of the image, the depth.
             
-            y_out = 0, x_out = 0;
+            int y_out = 0, x_out = 0;
 
             for (int y=0; y<_image_dim[1] - f_y; y+=_stride){	// image = ( depth x H x W )
                 x_out=0;
@@ -167,11 +169,11 @@ void Convolutional::bp(volume d_out_vol, volume& d_input){
     volume d_filters(_specs[0], _specs[1], _specs[2], _specs[3]);   // The list of lists of error terms (lowercase deltas) 
     vector<double> d_bias;
 
-    int y_out=0, x_out = 0;
 
+    #pragma omp parallel for
     for(int kernel=0; kernel < n_kernel; kernel++){
     
-        y_out=0, x_out = 0;
+        int y_out=0, x_out = 0;
 
         for (int y=0; y<_image_dim[1] - f_y - 2* _padding; y+=_stride){		// image = ( depth x H x W )
             
@@ -206,11 +208,12 @@ void Convolutional::bp(volume d_out_vol, volume& d_input){
     }
 
     // loss gradient of the bias
-    double k_bias=0;
 
     for(int kernel=0; kernel < n_kernel; kernel++){
         
-        k_bias=0;
+        double k_bias=0;
+
+        #pragma omp parallel for reduction(+: k_bias)
         for (int y=0; y<d_out_vol.get_shape(1); y++){
             for (int x=0; x<d_out_vol.get_shape(2); x++ ){
                 int i[3]={kernel, y, x};
@@ -235,6 +238,7 @@ void Convolutional::_gd(volume& d_filter, vector<double>& d_bias){
     
     int  n_kernel= _specs[0], f_y= _specs[1], f_x= _specs[2], f_d= _specs[3];
 
+    #pragma omp parallel for
     for(int kernel=0; kernel < n_kernel; kernel++){
         
         for (int y=0; y<f_y; y++){
@@ -251,8 +255,10 @@ void Convolutional::_gd(volume& d_filter, vector<double>& d_bias){
             }
         }
     }
-    
-    for(int i=0; i<(int)_bias.size(); i++) _bias[i] -= _eta * d_bias[i];
+
+    #pragma omp parallel for 
+    for(int i=0; i<(int)_bias.size(); i++) 
+        _bias[i] -= _eta * d_bias[i];
 
     _iteration ++;
 
