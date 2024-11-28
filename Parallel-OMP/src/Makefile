@@ -9,7 +9,7 @@ CNN.o: CNN.h CNN.cpp Volumes.h Volumes.cpp Filters.h Filters.cpp Datasets.h Data
 	g++ -c -Wall CNN.h CNN.cpp Volumes.h Volumes.cpp Filters.h Filters.cpp Datasets.h Datasets.cpp MLP.h MLP.cpp 
 
 Filters.o: Filters.h Filters.cpp Volumes.h Volumes.cpp
-	g++ -c -Wall Volumes.h Volumes.cpp Filters.h Filters.cpp
+	g++ -c -Wall -Wextra -O3 -fopenmp Volumes.h Volumes.cpp Filters.h Filters.cpp
 
 Datasets.o: Datasets.cpp Datasets.h Volumes.h Volumes.cpp
 	g++ -c -Wall Datasets.h Datasets.cpp Volumes.h Volumes.cpp
