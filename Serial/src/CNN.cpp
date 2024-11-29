@@ -60,7 +60,6 @@ void CNN::_forward(volume& image){
 			_conv_index++;
 			image=img_out;			
 		}
-		else if(_layers[i]=='P'){}
 		else if(_layers[i]=='D'){
 
 			if(_dense_input_shape[0]==0){
@@ -91,7 +90,6 @@ void CNN::_backward(vector<double>& gradient){
 			_convs[_conv_index].bp(img_in, img_out);	
 			img_in=img_out;	
 		}
-		else if(_layers[i]=='P'){}
 		else if(_layers[i]=='D'){	
 			gradient=_dense[0].bp(gradient);	
 			

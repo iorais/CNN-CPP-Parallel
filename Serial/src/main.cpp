@@ -80,7 +80,7 @@ int main(int argc, char ** argv){
     auto train_start = high_resolution_clock::now(); 
     network.training(num_epochs, preview_period);
     auto train_end = high_resolution_clock::now();
-    auto train_time = duration_cast<milliseconds>(train_start - train_end).count();
+    auto train_time = duration_cast<milliseconds>(train_end - train_start).count();
 
     cout << "Training took " << train_time << "ms with " << num_epochs << "epochs" << endl;
 
@@ -88,7 +88,7 @@ int main(int argc, char ** argv){
     auto test_start = high_resolution_clock::now();
     network.testing(10);
     auto test_end = high_resolution_clock::now();
-    auto test_time = duration_cast<milliseconds>(test_start - test_end).count();
+    auto test_time = duration_cast<milliseconds>(test_end - test_start).count();
 
     cout << "Testing took " << test_time << "ms with " << num_epochs << "epochs" << endl;
 
