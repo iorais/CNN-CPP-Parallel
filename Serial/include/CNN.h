@@ -5,6 +5,7 @@
 #include <ctime>
 #include <math.h>
 #include <string.h> 
+#include <chrono>
 
 #include "Volumes.h"
 #include "Filters.h"
@@ -12,6 +13,7 @@
 #include "MLP.h"
 
 using namespace std;
+using namespace std::chrono;
 
 class CNN{
 
@@ -34,7 +36,7 @@ class CNN{
 
         void _forward(volume& image);
         void _backward(vector<double>& gradient);
-        void _iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list,int preview_period ,bool b_training = true);
+        std::pair<double,double> _iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list,int preview_period ,bool b_training = true);
         void _get_image(volume& image, volume& dataset, int index);
         
     public:
@@ -48,6 +50,11 @@ class CNN{
         void testing(int preview_period = 1);
         void sanity_check(int set_size=50 ,int epochs=200);
         void plot_results();
+        public:
+        int get_total_layers() const { 
+            return _tot_layers; 
+        }
+
         ~CNN();
 
 };

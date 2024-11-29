@@ -123,10 +123,12 @@ void CNN::_get_image(volume& image, volume& dataset, int index){
 }
 
 
-void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list, int preview_period, bool b_training ){
+std::pair<double,double> CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<double>& loss_list, vector<double>& acc_list, int preview_period, bool b_training ){
 
 		int label = 0; 
 		double accuracy = 0, loss = 0, correctAnswer = 0;
+		double fwd_time = 0.0;
+		double bp_time = 0.0;
 		volume image;
 		
   		// stores time in t_start
@@ -143,8 +145,11 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 			//feed the sample into the network 
 			//The result is stored in _result
 			_conv_index=0;
+			auto f_start = chrono::high_resolution_clock::now();
 			_forward(image);	//--> _result
-
+			auto f_end = chrono::high_resolution_clock::now();
+			fwd_time += duration_cast<milliseconds>(f_end - f_start).count();
+			
 			//Error evaluation:
 			vector<double> y(_num_classes,0), error(_num_classes,0);
 			y[label]=1;
@@ -172,8 +177,13 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 
 			//adjust the weight
 
-			if (b_training) _backward(error);
-				
+			if (b_training){ 
+				auto b_start = chrono::high_resolution_clock::now();
+				_backward(error);
+				auto b_end = chrono::high_resolution_clock::now();
+				bp_time += duration_cast<milliseconds>(b_end - b_start).count();
+			}
+
 			if((sample+1)%preview_period==0 && sample!=1) {
 
 				double left, total;
@@ -181,10 +191,10 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 				time(&elapsed);
 				total=(double) (elapsed-t_start)/sample*DS_len;
 				left=total - (double) (elapsed - t_start);
-				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  ||  Elapsed time: %02.2f - Left time: %02.2f - Total time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
+				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Label: %d - Prediction: %d  ||  Elapsed time: %02.2f - Left time: %02.2f - Total time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
 			}
 		}
-
+	return {fwd_time,bp_time};
 }
 
 
@@ -197,22 +207,34 @@ void CNN::training( int epochs, int preview_period, int batch_size, bool validat
 	else{
 
 		cout<<"\n\n\no Training: "<<endl;
+		double total_fwd_time =0.0;
+		double total_bp_time =0.0;
 
 		for(int epoch=0; epoch<epochs; epoch++){
 			
 			cout<< "\n\to Epoch "<<epoch+1 <<endl;
 			//Batch Size = 1 => stochastic gradient descent learning algorithm
-			_iterate(Train_DS, Train_L, batch_size, train_loss, train_acc, preview_period, true);
+			std::pair<double,double> times = _iterate(Train_DS, Train_L, batch_size, train_loss, train_acc, preview_period, true);
+			total_fwd_time += times.first;
+			total_bp_time += times.second; 
 			cout << endl;
 			/*
 			cout<<("\nValidating:\n")<<endl;
 			//the model evaluation is performed on the validation set after every epoch	
 			_iterate(valid, valid_loss, valid_acc, false);
 			*/
-			if(validation)
-				_iterate(Test_DS, Test_L, batch_size, valid_loss, valid_acc, preview_period, false);
+			std::pair<double,double> times2 = {0,0};
+			if(validation){
+				times2 = _iterate(Test_DS, Test_L, batch_size, valid_loss, valid_acc, preview_period, false);
+				total_fwd_time += times2.first;
+				total_bp_time += times2.second;
+			} 
+			cout << "Epoch time spent doing forward passes: " << times.first+times2.first << " ms" << endl;
+			cout << "Epoch time spent doing back passes: " << times.second+times2.second << " ms" << endl;
 			cout << endl;
 		}
+		cout << "Total time spent doing forward passes: " << total_fwd_time << " ms" << endl;
+		cout << "Total time spent doing back passes: " << total_bp_time << " ms" << endl;
 	}
 }
 

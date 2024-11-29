@@ -67,7 +67,7 @@ int main(int argc, char ** argv){
     network.add_conv(image_1, kernels_1, padding= 0, stride= 2, bias= 0.1, eta= 0.01 );
     network.add_conv(image_2 , kernels_2 , padding= 0, stride= 2, bias= 0.1, eta= 0.01);
     network.add_dense(input_layer=2*6*6, hidden, num_classes=10, bias=1.0,  adam=false, eta=0.5);
-
+    cout << "number of layers: " << network.get_total_layers() <<endl;
     //load the wanted dataset
 
     network.load_dataset("MNIST");
