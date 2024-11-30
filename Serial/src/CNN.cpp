@@ -149,14 +149,17 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 		int DS_len = dataset.get_shape(0);
 
 		for(int sample=0; sample<DS_len; sample++ ){
-			
+			auto epoch_start = chrono::high_resolution_clock::now();	
 			_get_image(image, dataset, sample);	
 			label = labels[sample];
 
 			//feed the sample into the network 
 			//The result is stored in _result
 			_conv_index=0;
+			auto fp_start = chrono::high_resolution_clock::now();
 			_forward(image);	//--> _result
+			auto fp_end = chrono::high_resolution_clock::now();
+			long fp_time = chrono::duration_cast<chrono::microseconds>(fp_end - fp_start).count(); 
 
 			//Error evaluation:
 			vector<double> y(_num_classes,0), error(_num_classes,0);
@@ -185,16 +188,25 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 
 			//adjust the weight
 
-			if (b_training) _backward(error);
-				
+			long bp_time = 0;
+			if (b_training) {
+				auto bp_start = chrono::high_resolution_clock::now();
+				_backward(error);
+				auto bp_end = chrono::high_resolution_clock::now();
+				bp_time = chrono::duration_cast<chrono::microseconds>(bp_end - bp_start).count();
+			}
+
+			auto epoch_end = chrono::high_resolution_clock::now();
+
 			if((sample+1)%preview_period==0 && sample!=1) {
+				long epoch_time = chrono::duration_cast<chrono::microseconds>(epoch_end - epoch_start).count();
 
 				double left, total;
 				time_t elapsed;
 				time(&elapsed);
 				total=(double) (elapsed-t_start)/sample*DS_len;
 				left=total - (double) (elapsed - t_start);
-				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  ||  Elapsed time: %02.2f - Left time: %02.2f - Total time: %02.2f \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, (double) elapsed-t_start,left, total   );
+				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  || Total time: %02.2f FP: %ld us BP: %ld us Epoch: %ld us \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, total, fp_time, bp_time, epoch_time);
 			}
 		}
 
