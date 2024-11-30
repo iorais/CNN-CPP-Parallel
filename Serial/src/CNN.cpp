@@ -13,14 +13,6 @@ void CNN::add_conv(vector<int>& image_dim, vector<int>& kernels, int padding, in
 }
 
 
-void CNN::add_pooling(int pool_size[2], int stride, string mode){
-
-	Pooling element(pool_size, stride, mode);
-	_pools.push_back(element);
-	_layers.push_back('P');
-	_tot_layers++;
-}
-
 void CNN::add_dense(int input, vector<int>& hidden, int num_classes, double bias, bool adam, double eta){
 
 	vector<int> layers(hidden); // Obtain a copy (since hidden can change outside)
@@ -68,10 +60,6 @@ void CNN::_forward(volume& image){
 			_conv_index++;
 			image=img_out;			
 		} else if(_layers[i]=='P') {
-			_pools[_pool_index].fwd(image,img_out);
-
-			_pool_index++;
-			image=img_out;
 		} else if(_layers[i]=='D') {
 
 			if(_dense_input_shape[0]==0){
@@ -142,14 +130,15 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 		double accuracy = 0, loss = 0, correctAnswer = 0;
 		volume image;
 		
-  		// stores time in t_start
-		time_t t_start;
-  		time(&t_start);
-		
+		double total = 0.0;
+
 		int DS_len = dataset.get_shape(0);
 
+		vector<double> total_error(_num_classes,0);
+		double batch_count = 0;
+
 		for(int sample=0; sample<DS_len; sample++ ){
-			auto epoch_start = chrono::high_resolution_clock::now();	
+			auto sample_start = chrono::high_resolution_clock::now();	
 			_get_image(image, dataset, sample);	
 			label = labels[sample];
 
@@ -165,7 +154,11 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 			vector<double> y(_num_classes,0), error(_num_classes,0);
 			y[label]=1;
 
-			for(int i=0; i<_num_classes; i++) error[i] = y[i] - _result[i];
+			batch_count++;
+			for(int i=0; i<_num_classes; i++) {
+				error[i] = y[i] - _result[i];
+				total_error[i] += error[i];
+			}
 			
 			// update MSE loss function
 			double sum_squared_error=0;
@@ -187,26 +180,23 @@ void CNN::_iterate(volume& dataset, vector<int>& labels, int batch_size, vector<
 			acc_list.push_back( accuracy );
 
 			//adjust the weight
-
 			long bp_time = 0;
-			if (b_training) {
+			if (b_training && ((sample+1)%batch_size==0 || sample+1==DS_len)) {
+				for(int i=0; i<_num_classes; i++) total_error[i] /= batch_count;
+
 				auto bp_start = chrono::high_resolution_clock::now();
-				_backward(error);
+				_backward(total_error);
 				auto bp_end = chrono::high_resolution_clock::now();
 				bp_time = chrono::duration_cast<chrono::microseconds>(bp_end - bp_start).count();
 			}
 
-			auto epoch_end = chrono::high_resolution_clock::now();
+			auto sample_end = chrono::high_resolution_clock::now();
+			long sample_time = chrono::duration_cast<chrono::microseconds>(sample_end - sample_start).count();
 
-			if((sample+1)%preview_period==0 && sample!=1) {
-				long epoch_time = chrono::duration_cast<chrono::microseconds>(epoch_end - epoch_start).count();
+			total += sample_time * 1e-6;
 
-				double left, total;
-				time_t elapsed;
-				time(&elapsed);
-				total=(double) (elapsed-t_start)/sample*DS_len;
-				left=total - (double) (elapsed - t_start);
-				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  || Total time: %02.2f FP: %ld us BP: %ld us Epoch: %ld us \r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, total, fp_time, bp_time, epoch_time);
+			if((sample+1)%preview_period==0 || sample+1==DS_len) {
+				printf("\t  [%s] Accuracy: %02.2f - Loss: %02.6f - Sample %04d  ||  Lable: %d - Prediction: %d  || Total time: %02.2f s FP: %ld us BP: %ld us Sample: %ld us \t\r", b_training ? "Train" : "Valid", accuracy, loss, sample+1, label, (int)prediction, total, fp_time, bp_time, sample_time);
 			}
 		}
 

@@ -19,10 +19,10 @@ int main(int argc, char ** argv){
     int num_epochs = 1;           
     bool sanity_check = false;
     int preview_period = 10;
-
+    int batch_size = 1;
 
     const char USAGE_MESSAGE[] = 
-    "Usage: ./CNN [--num_epochs <int>] [--sanity_check <bool>] [--preview_period <int>]\n"
+    "Usage: ./CNN [--num_epochs <int>] [--sanity_check <bool>] [--preview_period <int>] [--batch_size <int>]\n"
     "Default values:\n"
     "  --num_epochs: 1\n"
     "  --sanity_check: false\n"
@@ -43,6 +43,10 @@ int main(int argc, char ** argv){
             std::string value = argv[i + 1];
             preview_period = std::stoi(argv[i + 1]);
             i++; // Skip the next argument as it's part of --preview_period
+        } else if (arg == "--batch_size" && i + 1 < argc) {
+            std::string value = argv[i + 1];
+            batch_size = std::stoi(argv[i + 1]);
+            i++; // Skip the next argument as it's part of --batch_size
         } else {
             std::cerr 
                 << "Unknown argument: " << arg << std::endl 
@@ -76,7 +80,7 @@ int main(int argc, char ** argv){
 
     //train the network (Batch Size = 1)
 
-    network.training(num_epochs, preview_period);
+    network.training(num_epochs, preview_period, batch_size);
 
     //evaluate new samples 
 
