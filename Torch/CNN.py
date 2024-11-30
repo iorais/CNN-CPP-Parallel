@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
+from tqdm import tqdm
+
 # Define the CNN model
 class CNN(nn.Module):
     def __init__(self):
@@ -19,18 +21,23 @@ class CNN(nn.Module):
         torch.nn.init.constant_(self.conv2.bias, 0.1)  # Set bias to 0.1
         
         # Layer 3: Dense
-        self.fc = nn.Linear(2 * 6 * 6, 10, bias=True)
-        torch.nn.init.constant_(self.fc.bias, 1.0)  # Set bias to 1.0
+        self.fc1 = nn.Linear(72, 72, bias=True)
+        torch.nn.init.constant_(self.fc1.bias, 1.0)  # Set bias to 1.0
+
+        # Layer 4: Dense
+        self.fc2 = nn.Linear(72, 10, bias=True)
+        torch.nn.init.constant_(self.fc2.bias, 1.0)  # Set bias to 1.0
+
+        # Activation Function
+        self.leaky_relu = nn.LeakyReLU(negative_slope=0.001)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        # Layer 1: Convolution + ReLU
-        x = F.relu(self.conv1(x))
-        # Layer 2: Convolution + ReLU
-        x = F.relu(self.conv2(x))
-        # Flatten the tensor for the dense layer
-        x = x.view(x.size(0), -1)
-        # Layer 3: Dense + Softmax
-        x = F.softmax(self.fc(x), dim=1)
+        x = self.leaky_relu(self.conv1(x))
+        x = self.leaky_relu(self.conv2(x))
+        x = x.view(x.size(0), -1) # Flatten for dense layer
+        x = self.sigmoid(self.fc1(x))
+        x = self.sigmoid(self.fc2(x))
         return x
 
 
@@ -81,10 +88,10 @@ def load_labels(file_path, samples):
 
 def main():
     # Hyperparameters
-    learning_rate_conv = 0.5
+    learning_rate_conv = 0.1
     learning_rate_fc = 0.5
-    num_epochs = 100
-    batch_size = 32
+    num_epochs = 1
+    batch_size = 1 
 
     # Initialize the model, criterion, and optimizer
     model = CNN()
@@ -93,11 +100,12 @@ def main():
     optimizer = optim.SGD([
         {'params': model.conv1.parameters(), 'lr': learning_rate_conv},
         {'params': model.conv2.parameters(), 'lr': learning_rate_conv},
-        {'params': model.fc.parameters(), 'lr': learning_rate_fc}
+        {'params': model.fc1.parameters(), 'lr': learning_rate_fc},
+        {'params': model.fc2.parameters(), 'lr': learning_rate_fc}
     ])
 
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    # optimizer = optim.SGD(model.parameters(), lr=0.01)
+    # optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     criterion = nn.CrossEntropyLoss()
 
@@ -118,22 +126,32 @@ def main():
 
     model.to(device)
 
+    total = 0
+    correct = 0
+
     # Training loop
     for epoch in range(num_epochs):
-        for inputs, targets in trainLoader:
+        for inputs, targets in tqdm(trainLoader):
             inputs, targets = inputs.to(device), targets.to(device)
 
 
             # Forward pass
             outputs = model(inputs)
-            loss = criterion(outputs, targets.squeeze())
+            loss = criterion(outputs, targets.view(targets.size(0)))
             
             # Backward pass and optimization
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-        
+
+            # Compute accuracy
+            _, predicted = outputs.max(1)  # Get class with highest probability
+            correct += predicted.eq(targets.squeeze()).sum().item()
+            total += targets.size(0)
+
+        train_accuracy = correct / total * 100
         print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
+        print(f"Train Accuracy: {train_accuracy:.2f}%")
 
     print("Training complete!")
 
@@ -150,14 +168,14 @@ def main():
     total = 0
 
     with torch.no_grad():  # Disable gradient computation for testing
-        for inputs, targets in testLoader: 
+        for inputs, targets in tqdm(testLoader): 
             # Move data to the specified device
             inputs, targets = inputs.to(device), targets.to(device)
 
             # Forward pass
             outputs = model(inputs)
             # Compute loss
-            loss = criterion(outputs, targets.squeeze())
+            loss = criterion(outputs, targets.view(targets.size(0)))
             test_loss += loss.item() * inputs.size(0)  # Accumulate loss
             
             # Compute accuracy
