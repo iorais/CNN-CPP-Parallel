@@ -148,7 +148,7 @@ std::pair<double,double> CNN::_iterate(volume& dataset, vector<int>& labels, int
 			auto f_start = chrono::high_resolution_clock::now();
 			_forward(image);	//--> _result
 			auto f_end = chrono::high_resolution_clock::now();
-			fwd_time += duration_cast<milliseconds>(f_end - f_start).count();
+			fwd_time += chrono::duration_cast<chrono::milliseconds>(f_end - f_start).count();
 			
 			//Error evaluation:
 			vector<double> y(_num_classes,0), error(_num_classes,0);
@@ -181,7 +181,7 @@ std::pair<double,double> CNN::_iterate(volume& dataset, vector<int>& labels, int
 				auto b_start = chrono::high_resolution_clock::now();
 				_backward(error);
 				auto b_end = chrono::high_resolution_clock::now();
-				bp_time += duration_cast<milliseconds>(b_end - b_start).count();
+				bp_time += chrono::duration_cast<chrono::milliseconds>(b_end - b_start).count();
 			}
 
 			if((sample+1)%preview_period==0 && sample!=1) {

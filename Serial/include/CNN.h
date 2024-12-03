@@ -13,7 +13,7 @@
 #include "MLP.h"
 
 using namespace std;
-using namespace std::chrono;
+
 
 class CNN{
 
