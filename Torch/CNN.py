@@ -1,3 +1,5 @@
+import argparse
+
 import numpy as np
 
 import torch
@@ -86,12 +88,12 @@ def load_labels(file_path, samples):
     return labels[:samples]
     
 
-def main():
+def main(args):
     # Hyperparameters
     learning_rate_conv = 0.1
     learning_rate_fc = 0.5
-    num_epochs = 1
-    batch_size = 1 
+    num_epochs = args.num_epochs 
+    batch_size = args.batch_size
 
     # Initialize the model, criterion, and optimizer
     model = CNN()
@@ -131,7 +133,7 @@ def main():
 
     # Training loop
     for epoch in range(num_epochs):
-        for inputs, targets in tqdm(trainLoader):
+        for inputs, targets in tqdm(trainLoader, desc=f"[Training] Epoch #{epoch+1}/{num_epochs}"):
             inputs, targets = inputs.to(device), targets.to(device)
 
 
@@ -193,5 +195,28 @@ def main():
     print(f"Test Loss: {test_loss:.4f}")
     print(f"Test Accuracy: {test_accuracy:.2f}%")
 
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Parse training parameters.")
+    
+    # Add arguments for num_epochs and batch_size
+    parser.add_argument(
+        "--num_epochs",
+        type=int,
+        default=1,  # Default value if not provided
+        help="Number of epochs for training."
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=1,  # Default value if not provided
+        help="Batch size for training."
+    )
+    
+    # Parse the arguments
+    args = parser.parse_args()
+    return args
+
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    main(args)
