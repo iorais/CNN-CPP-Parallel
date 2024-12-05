@@ -134,6 +134,8 @@ __global__ void fp_preact_c1(float input[28][28], float preact[8][13][13], float
 
 	const int N = 3*3*8*13*13;
 
+	const int stride = 2;
+
 	for (int n = N * pos / size; n < N * (pos+1) / size; ++n) {
 		int idx = n;
 		const int i1 = ((idx /= 1	) % 3);
@@ -142,7 +144,7 @@ __global__ void fp_preact_c1(float input[28][28], float preact[8][13][13], float
 		const int i4 = ((idx /= 8	) % 13);
 		const int i5 = ((idx /= 13	) % 13);
 
-		atomicAdd(&preact[i3][i4][i5], weight[i3][i1][i2] * input[i4 + i1][i5 + i2]);
+		atomicAdd(&preact[i3][i4][i5], weight[i3][i1][i2] * input[stride * i4 + i1][stride * i5 + i2]);
 	}
 }
 
