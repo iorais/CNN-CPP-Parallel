@@ -17,7 +17,7 @@ static Layer l_c1 = Layer(3*3, 8, 13*13*8);          // First convolutional laye
 static Layer l_c2 = Layer(3*3*8, 16, 11*11*16);      // Second convolutional layer
 static Layer l_f = Layer(11*11*16, 10, 10);          // Fully connected layer
 
-static void learn();
+static void learn(int iter);
 static unsigned int classify(double data[28][28]);
 static void test();
 static double forward_pass(double data[28][28]);
@@ -25,9 +25,9 @@ static double back_pass();
 
 static inline void loaddata()
 {
-	mnist_load("data/train-images.idx3-ubyte", "data/train-labels.idx1-ubyte",
+	mnist_load("../datasets/train-images.idx3-ubyte", "../datasets/train-labels.idx1-ubyte",
 		&train_set, &train_cnt);
-	mnist_load("data/t10k-images.idx3-ubyte", "data/t10k-labels.idx1-ubyte",
+	mnist_load("../datasets/t10k-images.idx3-ubyte", "../datasets/t10k-labels.idx1-ubyte",
 		&test_set, &test_cnt);
 }
 
@@ -42,7 +42,7 @@ int main(int argc, const  char **argv)
 	}
 
 	loaddata();
-	learn();
+	learn(1);
 	test();
 
 	return 0;
@@ -71,17 +71,17 @@ static double forward_pass(double data[28][28])
 	
 	fp_preact_c1<<<64, 64>>>((float (*)[28])l_input.output, (float (*)[13][13])l_c1.preact, (float (*)[3][3])l_c1.weight);
 	fp_bias_c1<<<64, 64>>>((float (*)[13][13])l_c1.preact, l_c1.bias);
-	apply_step_function<<<64, 64>>>(l_c1.preact, l_c1.output, l_c1.O);
+	apply_leakyReLU<<<64, 64>>>(l_c1.preact, l_c1.output, l_c1.O);
 
 	fp_preact_c2<<<64, 64>>>((float (*)[13][13])l_c1.output, 
                          (float (*)[11][11])l_c2.preact, 
                          (float (*)[8][3][3])l_c2.weight);
 	fp_bias_c2<<<64, 64>>>((float (*)[11][11])l_c2.preact, l_c2.bias);
-	apply_step_function<<<64, 64>>>(l_c2.preact, l_c2.output, l_c2.O);
+	apply_leakyReLU<<<64, 64>>>(l_c2.preact, l_c2.output, l_c2.O);
 
 	fp_preact_f<<<64, 64>>>((float (*)[11][11])l_c2.output, l_f.preact, (float (*)[16][11][11])l_f.weight);
 	fp_bias_f<<<64, 64>>>(l_f.preact, l_f.bias);
-	apply_step_function<<<64, 64>>>(l_f.preact, l_f.output, l_f.O);
+	apply_sigmoid<<<64, 64>>>(l_f.preact, l_f.output, l_f.O);
 	
 	end = clock();
 	return ((double) (end - start)) / CLOCKS_PER_SEC;
@@ -152,13 +152,12 @@ static void unfold_input(double input[28][28], double unfolded[13*13][3*3])
 		}
 }
 
-static void learn()
+static void learn(int iter)
 {
 	static cublasHandle_t blas;
 	cublasCreate(&blas);
 
 	float err;
-	int iter = 10;
 	
 	double time_taken = 0.0;
 

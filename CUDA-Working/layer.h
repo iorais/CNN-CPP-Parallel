@@ -8,6 +8,8 @@
 #define LAYER_H
 #endif
 
+#define ALPHA 0.001
+
 const static float dt = 1.0E-01f;
 const static float threshold = 1.0E-02f;
 
@@ -36,8 +38,10 @@ class Layer {
 
 
 // Utility CUDA kernel functions
-__device__ float step_function(float v);
-__global__ void apply_step_function(float *input, float *output, const int N);
+__device__ float sigmoid(float v);
+__device__ float leakyReLU(float v);
+__global__ void apply_sigmoid(float *input, float *output, const int N);
+__global__ void apply_leakyReLU(float *input, float *output, const int N);
 __global__ void makeError(float *err, float *output, unsigned int Y, const int N);
 __global__ void apply_grad(float *output, float *grad, const int N);
 

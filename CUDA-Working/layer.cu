@@ -77,18 +77,33 @@ void Layer::bp_clear()
 }
 
 
-__device__ float step_function(float v)
+__device__ float sigmoid(float v)
 {
 	return 1 / (1 + exp(-v));
 }
 
-__global__ void apply_step_function(float *input, float *output, const int N)
+__device__ float leakyReLU(float v)
+{
+	return v > 0 ? v : ALPHA * v;
+}
+
+__global__ void apply_sigmoid(float *input, float *output, const int N)
 {
 	const int pos = blockIdx.x * blockDim.x + threadIdx.x;
 	const int size = blockDim.x * gridDim.x;
 
 	for (int idx = N * pos / size; idx < N * (pos+1) / size; ++idx) {
-		output[idx] = step_function(input[idx]);
+		output[idx] = sigmoid(input[idx]);
+	}
+}
+
+__global__ void apply_leakyReLU(float *input, float *output, const int N)
+{
+	const int pos = blockIdx.x * blockDim.x + threadIdx.x;
+	const int size = blockDim.x * gridDim.x;
+
+	for (int idx = N * pos / size; idx < N * (pos+1) / size; ++idx) {
+		output[idx] = leakyReLU(input[idx]);
 	}
 }
 
@@ -295,10 +310,17 @@ __global__ void bp_preact_c2(float d_preact[16][11][11], float d_output[16][11][
         const int i2 = ((idx /= 16) % 11); // Row index
         const int i3 = ((idx /= 11) % 11); // Column index
 
-        const float o = step_function(preact[i1][i2][i3]); // Step function output from forward pass
+		// Compute the derivative of the activation function
+
+		// sigmoid
+        // const float o = sigmoid(preact[i1][i2][i3]);
+		// const float d = o * (1 - o);
+
+		// leaky ReLU
+		const float d = preact[i1][i2][i3] < 0 ? ALPHA : 1;
 
         // Compute gradient for pre-activation using the derivative of the step function
-        d_preact[i1][i2][i3] = d_output[i1][i2][i3] * o * (1 - o);
+        d_preact[i1][i2][i3] = d_output[i1][i2][i3] * d;
     }
 }
 
@@ -393,7 +415,7 @@ __global__ void bp_preact_s1(float d_preact[6][6][6], float d_output[6][6][6], f
 		const int i2 = ((idx /= 6	) % 6);
 		const int i3 = ((idx /= 6	) % 6);
 
-		const float o = step_function(preact[i1][i2][i3]);
+		const float o = sigmoid(preact[i1][i2][i3]);
 
 		d_preact[i1][i2][i3] = d_output[i1][i2][i3] * o * (1 - o);
 	}
@@ -524,10 +546,15 @@ __global__ void bp_preact_c1(float d_preact[8][13][13], float d_output[8][13][13
         const int w = ((idx /= 13) % 13);     // Width index
 
         // Compute the derivative of the activation function
-        const float activation = step_function(preact[out_c][h][w]);
-        const float activation_derivative = activation * (1 - activation);
+
+		// sigmoid
+        // const float o = sigmoid(preact[out_c][h][w]);
+        // const float d = o * (1 - o);
+
+		// leaky ReLU
+		const float d = preact[out_c][h][w] < 0 ? ALPHA : 1;
 
         // Compute the gradient for the pre-activation value
-        d_preact[out_c][h][w] = d_output[out_c][h][w] * activation_derivative;
+        d_preact[out_c][h][w] = d_output[out_c][h][w] * d;
     }
 }
