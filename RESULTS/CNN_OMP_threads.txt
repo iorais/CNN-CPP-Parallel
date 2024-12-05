@@ -1,0 +1,346 @@
+make: Nothing to be done for 'all'.
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 1
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.87 - Loss: nan - Sample 60000  ||  Lable: 8 - Prediction: 0  || Total time: 174.94 s FP: 2178 us BP: 695 us Sample: 2886 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 9.80 - Loss: nan - Sample 10000  ||  Lable: 6 - Prediction: 0  || Total time: 22.20 s FP: 2330 us BP: 0 us Sample: 2342 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 2
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 78.56 - Loss: 0.724300 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 123.04 s FP: 1316 us BP: 710 us Sample: 2039 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 83.37 - Loss: 0.001134 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 13.40 s FP: 1316 us BP: 0 us Sample: 1329 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 3
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 75.96 - Loss: 0.202665 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 92.81 s FP: 963 us BP: 553 us Sample: 1529 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 77.12 - Loss: 0.006463 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 9.85 s FP: 965 us BP: 0 us Sample: 977 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 4
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 10.04 - Loss: 2.380437 - Sample 60000  ||  Lable: 8 - Prediction: 6  || Total time: 84.73 s FP: 784 us BP: 580 us Sample: 1378 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 10.52 - Loss: 2.205638 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 8.06 s FP: 820 us BP: 0 us Sample: 833 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 5
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 78.06 - Loss: 0.093706 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 70.20 s FP: 661 us BP: 505 us Sample: 1180 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 78.56 - Loss: 0.002723 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 6.85 s FP: 689 us BP: 0 us Sample: 702 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 6
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.59 - Loss: 3.391246 - Sample 60000  ||  Lable: 8 - Prediction: 5  || Total time: 67.33 s FP: 565 us BP: 540 us Sample: 1119 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 12.45 - Loss: 3.884555 - Sample 10000  ||  Lable: 6 - Prediction: 8  || Total time: 5.78 s FP: 567 us BP: 0 us Sample: 580 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 7
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 75.26 - Loss: 0.225548 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 80.51 s FP: 614 us BP: 735 us Sample: 1362 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 70.98 - Loss: 0.001432 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 5.14 s FP: 500 us BP: 0 us Sample: 513 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 8
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.87 - Loss: nan - Sample 60000  ||  Lable: 8 - Prediction: 0  || Total time: 72.80 s FP: 427 us BP: 453 us Sample: 894 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 9.80 - Loss: nan - Sample 10000  ||  Lable: 6 - Prediction: 0  || Total time: 4.40 s FP: 438 us BP: 0 us Sample: 451 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 12
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.59 - Loss: 3.389068 - Sample 60000  ||  Lable: 8 - Prediction: 5  || Total time: 60.19 s FP: 737 us BP: 591 us Sample: 1342 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 11.15 - Loss: 3.463556 - Sample 10000  ||  Lable: 6 - Prediction: 8  || Total time: 4.33 s FP: 428 us BP: 0 us Sample: 441 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 14
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 77.69 - Loss: 0.306748 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 229.65 s FP: 4060 us BP: 1109 us Sample: 5183 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 76.60 - Loss: 0.006158 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 3.41 s FP: 323 us BP: 0 us Sample: 336 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 16
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 78.42 - Loss: 0.307499 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 257.02 s FP: 3168 us BP: 1218 us Sample: 4400 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 73.52 - Loss: 0.037642 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 3.06 s FP: 294 us BP: 0 us Sample: 307 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 18
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 10.63 - Loss: 6.986182 - Sample 60000  ||  Lable: 8 - Prediction: 5  || Total time: 90.98 s FP: 624 us BP: 553 us Sample: 1196 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 13.06 - Loss: 3.101618 - Sample 10000  ||  Lable: 6 - Prediction: 5  || Total time: 4.35 s FP: 419 us BP: 0 us Sample: 438 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 20
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.87 - Loss: nan - Sample 60000  ||  Lable: 8 - Prediction: 0  || Total time: 74.24 s FP: 875 us BP: 514 us Sample: 1408 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 9.80 - Loss: nan - Sample 10000  ||  Lable: 6 - Prediction: 0  || Total time: 4.18 s FP: 396 us BP: 0 us Sample: 415 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 22
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 9.87 - Loss: nan - Sample 60000  ||  Lable: 8 - Prediction: 0  || Total time: 197.14 s FP: 2579 us BP: 982 us Sample: 3581 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 9.80 - Loss: nan - Sample 10000  ||  Lable: 6 - Prediction: 0  || Total time: 3.77 s FP: 355 us BP: 0 us Sample: 376 us 	
+
+
+o Done
+Number of epochs: 1
+Sanity check: disabled
+Preview period: 100000
+Batch size: 1
+Thread count: 24
+
+o Getting MNIST datasets
+
+
+
+
+o Training: 
+
+	o Epoch 1
+	  [Train] Accuracy: 76.90 - Loss: 0.168345 - Sample 60000  ||  Lable: 8 - Prediction: 8  || Total time: 153.85 s FP: 1724 us BP: 604 us Sample: 2347 us 	
+
+
+
+o Testing:
+	  [Valid] Accuracy: 72.04 - Loss: 0.018206 - Sample 10000  ||  Lable: 6 - Prediction: 6  || Total time: 3.84 s FP: 367 us BP: 0 us Sample: 385 us 	
+
+
+o Done
