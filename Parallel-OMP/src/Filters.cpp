@@ -117,7 +117,7 @@ void Convolutional::fwd(volume image, volume& out){
     // Now image is saved and adjusted in _cache 
 
 
-    #pragma omp parallel for
+    #pragma omp parallel for collapse(2)
     for(int kernel=0; kernel < n_kernel; kernel++){
 
         for (int layer=0; layer<depth; layer++ ){//each kernel has n (3) layers, one for each of the n (3) layers of the image, the depth.
@@ -170,7 +170,7 @@ void Convolutional::bp(volume d_out_vol, volume& d_input){
     vector<double> d_bias;
 
 
-    #pragma omp parallel for
+    #pragma omp parallel for collapse(2)
     for(int kernel=0; kernel < n_kernel; kernel++){
     
         int y_out=0, x_out = 0;

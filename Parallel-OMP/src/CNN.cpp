@@ -242,7 +242,7 @@ void CNN::testing(int preview_period ){
 	else{
 		cout<<("\n\no Testing:")<<endl;
 		//evaluate the performances on the test dataset
-		_iterate(Test_DS, Test_L, 1, test_loss, test_acc, preview_period,false);
+		_iterate(Test_DS, Test_L, 1, test_loss, test_acc, 100000,false);
 	}
 }
 

@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <vector>
-
+#include <omp.h>
 #include "CNN.h"
 
 using namespace std;
@@ -48,6 +48,11 @@ int main(int argc, char ** argv){
             std::string value = argv[i + 1];
             batch_size = std::stoi(argv[i + 1]);
             i++; // Skip the next argument as it's part of --batch_size
+        }
+        else if (arg == "--nthreads" && i + 1 < argc) {
+            int value = atoi(argv[i + 1]);
+            omp_set_num_threads(value);
+            i++; // Skip the next argument as it's part of --batch_size
         } else {
             std::cerr 
                 << "Unknown argument: " << arg << std::endl 
@@ -61,7 +66,13 @@ int main(int argc, char ** argv){
     std::cout << "Sanity check: " << (sanity_check ? "enabled" : "disabled") << std::endl;
     std::cout << "Preview period: " << preview_period << std::endl;
     std::cout << "Batch size: " << batch_size << std::endl;
-
+    #pragma omp parallel
+    {
+        if(omp_get_thread_num() == 0){
+            int nthreads = omp_get_num_threads();
+            std::cout << "Thread count: " << nthreads << std::endl;
+        }
+    }
     //network istantiation
 
     CNN network;
