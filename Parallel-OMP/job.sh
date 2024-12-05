@@ -19,4 +19,7 @@
 
 module load GCC
 make
-bin/CNN --num_epochs 1 --preview_period 10
+for threads in {1,2,4,8,12,14,16,18,20,22,24}; do
+  export OMP_NUM_THREADS=$threads
+  bin/CNN --num_epochs 1 --preview_period 100000
+done

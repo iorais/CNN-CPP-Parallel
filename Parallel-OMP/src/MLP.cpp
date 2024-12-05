@@ -87,6 +87,7 @@ void MultiLayerPerceptron::print_weights() {
 vector<double> MultiLayerPerceptron::run(vector<double> x) {
     
     values[0] = x;
+    // #pragma omp parallel for
     for (int i = 1; i < (int) network.size(); i++)
         for (int j = 0; j < layers[i]; j++)
             values[i][j] = network[i][j].run(values[i-1]);
@@ -142,12 +143,13 @@ vector<double> MultiLayerPerceptron::bp(vector<double> error){
     vector<double> outputs= values.back();
 
     // STEP 3: Calculate the output error terms
+    #pragma omp parallel for
     for (int i = 0; i < (int) outputs.size(); i++)
         d.back()[i] = outputs[i] * (1 - outputs[i]) * (error[i]);
 
-    // STEP 4: Calculate the error term of each unit on each layer    
+    // STEP 4: Calculate the error term of each unit on each layer  
     for (int i = ((int) network.size())-2; i > 0; i--)
-
+        #pragma omp parallel for
         for (int h = 0; h < (int) network[i].size(); h++){
 
             double fwd_error = 0.0;
