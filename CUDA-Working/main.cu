@@ -6,6 +6,7 @@
 #include <cuda.h>
 #include <cstdio>
 #include <time.h>
+#include <chrono>
 
 static mnist_data *train_set, *test_set;
 static unsigned int train_cnt, test_cnt;
@@ -42,9 +43,12 @@ int main(int argc, const  char **argv)
 	}
 
 	loaddata();
+	auto start = std::chrono::high_resolution_clock::now();
 	learn(1);
+	auto end = std::chrono::high_resolution_clock::now();
 	test();
-
+	std::chrono::duration<double> elapsed = end - start;
+	fprintf(stdout, "Wall Clock Time for Training - %lf\n", elapsed.count());
 	return 0;
 }
 
@@ -160,6 +164,9 @@ static void learn(int iter)
 	float err;
 	
 	double time_taken = 0.0;
+	double forward_time = 0.0;
+	double back_time = 0.0;
+	int epochs = iter;
 
 	fprintf(stdout ,"Learning\n");
 
@@ -169,7 +176,7 @@ static void learn(int iter)
 		for (int i = 0; i < train_cnt; ++i) {
 			float tmp_err;
 
-			time_taken += forward_pass(train_set[i].data);
+			forward_time += forward_pass(train_set[i].data);
 
 			l_f.bp_clear();
 			l_c2.bp_clear();
@@ -180,9 +187,9 @@ static void learn(int iter)
 			cublasSnrm2(blas, 10, l_f.d_preact, 1, &tmp_err);
 			err += tmp_err;
 
-			time_taken += back_pass();
+			back_time += back_pass();
 		}
-
+		time_taken = forward_time + back_time;
 		err /= train_cnt;
 		fprintf(stdout, "error: %e, time_on_gpu: %lf\n", err, time_taken);
 
@@ -192,8 +199,10 @@ static void learn(int iter)
 		}
 
 	}
-	
-	fprintf(stdout, "\n Time - %lf\n", time_taken);
+	fprintf(stdout, "Training complete for %d epochs\n", epochs);
+	fprintf(stdout, "Total GPU Time - %lf\n", time_taken);
+	fprintf(stdout, "Forward Pass GPU Time - %lf\n", forward_time);
+	fprintf(stdout, "Backward Pass GPU Time - %lf\n", back_time);
 }
 
 

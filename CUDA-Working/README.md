@@ -1,9 +1,17 @@
-# CNN on CUDA
-Implementation of Convolutional Neural Network using CUDA. On testing with MNIST dataset for 50 epochs, accuracy of 97.22% was obtained with a GPU training time of about 650 seconds.
-
 ### Architecture
-All tests performed on an Nvidia GeForce 840M GPU, running CUDA 8.0.61.
+All tests performed on an Nvidia Tesla V100 GPU
+Training with 1 epoch: 85% accuracy
+Total GPU Time 5.47s
+Wall Clock Training Time 9.9s
 
 ### Compiling and Execution
+On WAVE HPC
+srun --partition=gpu --gres=gpu:1 --cpus-per-task=4 --mem=16G --nodes=1 --pty /bin/bash
+
+module load CUDA
+
 To compile just navigate to root and type `make`
 Executable can be run using `./CNN`
+
+
+
