@@ -199,7 +199,7 @@ static void learn(int iter)
 		}
 
 	}
-	fprintf(stdout, "Training complete for %d epochs\n", epochs);
+	fprintf(stdout, "\nTraining complete for %d epochs\n", epochs);
 	fprintf(stdout, "Total GPU Time - %lf\n", time_taken);
 	fprintf(stdout, "Forward Pass GPU Time - %lf\n", forward_time);
 	fprintf(stdout, "Backward Pass GPU Time - %lf\n", back_time);
