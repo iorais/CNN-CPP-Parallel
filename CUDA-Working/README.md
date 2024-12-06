@@ -9,7 +9,7 @@ On WAVE HPC
 srun --partition=gpu --gres=gpu:1 --cpus-per-task=4 --mem=16G --nodes=1 --pty /bin/bash
 
 module load CUDA
-To compile just navigate to root and type `make`
+To compile navigate to Parallel-CUDA and type `make`
 Executable can be run using `./CNN`
 
 or 
